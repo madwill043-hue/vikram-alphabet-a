@@ -58,7 +58,7 @@ canvas{width:100%;max-width:300px;aspect-ratio:1;background:#fff;border:2px dash
 .foot img{width:100%;border-radius:10px;display:block}
 [hidden]{display:none!important}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
-@media print{body *{visibility:hidden}.cert,.cert *{visibility:visible}.cert{position:absolute;inset:0;margin:20px}}
+@media print{body *{visibility:hidden}.cert,.cert *{visibility:visible}.cert{position:absolute;inset:0;margin:20px;background:#fff!important;color:#000!important}.cert h3{color:#d4142c}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -86,7 +86,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 </section>
 
 <section id="p1" class="pn" hidden>
-  <div class="panel"><h2>Find Letter A - A ढूंढो</h2><p class="hint">Tap all A / a - सभी A पर टैप करो</p><div class="grid" id="grid"></div><p id="fnd"></p></div>
+  <div class="panel"><h2>Find Letter A - A ढूंढो</h2><p class="hint">Tap all A / a - सभी A पर टैप करो</p><div class="grid" id="grid"></div><p id="fnd" aria-live="polite"></p></div>
   <div class="nav"><button data-go="0">← Back</button><button class="go" data-go="2">Next: Write ✍️ →</button></div>
 </section>
 
@@ -105,9 +105,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <section id="p4" class="pn" hidden>
   <div class="panel"><h2>A Quiz - A की परीक्षा</h2><div id="quiz"></div>
     <div id="res" hidden>
-      <p style="font-size:1.4rem;font-weight:800;margin:12px 0 0" id="score"></p>
-      <div class="cert"><h3>VIKRAM ENGLISH SCHOOL, HATTA</h3><b>CERTIFICATE OF ACHIEVEMENT</b><p style="margin:2px">Proudly presented to</p><div class="nm" id="nm">Student</div><p style="margin:2px">Learned Letter A - Angry ants ate apples<br>Apple · Ant · Aeroplane · Alligator</p></div>
-      <div class="acts" style="flex-wrap:wrap"><button class="ok" id="print">🖨️ Print Certificate</button><button id="wa">💬 WhatsApp</button><button id="again">🔄 Learn Again</button></div>
+      <p style="font-size:1.4rem;font-weight:800;margin:12px 0 0" id="score" aria-live="polite"></p>
+      <div class="cert"><h3>VIKRAM ENGLISH SCHOOL, HATTA</h3><b>CERTIFICATE OF ACHIEVEMENT</b><p style="margin:2px">Proudly presented to</p><div class="nm" id="nm">Student</div><div id="cls" style="font-weight:700">Class: Nursery</div><p style="margin:2px">Learned Letter A - Angry ants ate apples<br>Apple · Ant · Aeroplane · Alligator</p></div>
+      <div class="acts" style="flex-wrap:wrap"><button class="ok" id="print">🖨️ Print Certificate</button><button id="wa">💬 WhatsApp</button><button id="retry">🔁 Quiz Again</button><button id="again">🔄 Learn Again</button></div>
     </div></div>
   <div class="nav"><button data-go="3">← Back</button></div>
 </section>
@@ -125,7 +125,7 @@ function star(key,n){if(key&&done[key])return;if(key)done[key]=1;stars+=n;$('sta
 $('snd').onclick=function(){sound=!sound;this.textContent=sound?'🔊':'🔇';if(!sound)try{speechSynthesis.cancel()}catch(e){}};
 var TN=['📖 Learn','👀 Identify','✍️ Write A','🍎 Words','🎯 Quiz'],PC=[25,50,75,85,100],tb=[];
 TN.forEach(function(n,i){var b=document.createElement('button');b.textContent=n;b.onclick=function(){go(i)};$('tabs').appendChild(b);tb.push(b)});
-function go(n){step=n;for(var i=0;i<5;i++){$('p'+i).hidden=i!==n;tb[i].className=i===n?'on':''}
+function go(n){step=n;for(var i=0;i<5;i++){$('p'+i).hidden=i!==n;tb[i].className=i===n?'on':'';tb[i].setAttribute('aria-current',i===n?'page':'false')}
  $('prog').textContent='Progress: '+PC[n]+'%';$('fill').style.width=PC[n]+'%';window.scrollTo(0,0)}
 document.addEventListener('click',function(e){var g=e.target.closest('[data-go]');if(g)go(+g.dataset.go);var s=e.target.closest('[data-say]');if(s)say(s.dataset.say)});
 /* identify */
@@ -134,13 +134,13 @@ LT.forEach(function(l){var b=document.createElement('button');b.className='cell'
  if(l.toLowerCase()==='a'){b.classList.add('right');hit++;star(0,0);stars++;$('stars').textContent='Stars: ⭐ '+stars;say('A');$('fnd').textContent=hit+' / '+tot+(hit===tot?' 🎉 बहुत बढ़िया!':'')}
  else{b.classList.add('wrong');say('Try again')}};$('grid').appendChild(b)});
 /* write */
-var cv=$('cv'),cx=cv.getContext('2d'),dr=false,inked=false;
-function guide(){inked=false;cx.clearRect(0,0,300,300);cx.font='800 240px "Baloo 2",sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle='rgba(212,20,44,.15)';cx.fillText('A',150,165);cx.lineWidth=14;cx.lineCap='round';cx.lineJoin='round';cx.strokeStyle='#d4142c'}
+var cv=$('cv'),cx=cv.getContext('2d'),dr=false,inked=false,len=0,lx=0,ly=0,dpr=Math.min(window.devicePixelRatio||1,3);
+function guide(){inked=false;len=0;cv.width=300*dpr;cv.height=300*dpr;cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,300,300);cx.font='800 240px "Baloo 2",sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle='rgba(212,20,44,.15)';cx.fillText('A',150,165);cx.lineWidth=14;cx.lineCap='round';cx.lineJoin='round';cx.strokeStyle='#d4142c'}
 function pos(e){var r=cv.getBoundingClientRect();return[(e.clientX-r.left)*300/r.width,(e.clientY-r.top)*300/r.height]}
-cv.addEventListener('pointerdown',function(e){dr=true;inked=true;var p=pos(e);cx.beginPath();cx.moveTo(p[0],p[1]);cx.lineTo(p[0]+.1,p[1]);cx.stroke();try{cv.setPointerCapture(e.pointerId)}catch(x){}});
-cv.addEventListener('pointermove',function(e){if(!dr)return;var p=pos(e);cx.lineTo(p[0],p[1]);cx.stroke()});
+cv.addEventListener('pointerdown',function(e){dr=true;var p=pos(e);lx=p[0];ly=p[1];cx.beginPath();cx.moveTo(p[0],p[1]);cx.lineTo(p[0]+.1,p[1]);cx.stroke();try{cv.setPointerCapture(e.pointerId)}catch(x){}});
+cv.addEventListener('pointermove',function(e){if(!dr)return;var p=pos(e);len+=Math.hypot(p[0]-lx,p[1]-ly);lx=p[0];ly=p[1];if(len>120)inked=true;cx.lineTo(p[0],p[1]);cx.stroke()});
 ['pointerup','pointercancel'].forEach(function(n){cv.addEventListener(n,function(){dr=false})});
-$('clr').onclick=guide;
+$('clr').onclick=function(){guide();$('wrote').textContent='✅ I Wrote A - मैंने लिखा'};
 $('wrote').onclick=function(){if(!inked){say('Trace the letter A first');this.textContent='✍️ पहले A लिखो';return}star('w',3);say('Well done!');this.textContent='⭐ शाबाश!'};
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(guide);
 /* words */
@@ -150,13 +150,13 @@ $('wrote').onclick=function(){if(!inked){say('Trace the letter A first');this.te
 /* quiz */
 var QS=[['1. Which is Letter A? - A कौन सा है?',['A','B','C'],'A'],['2. Apple starts with? - Apple किससे शुरू?',['A','B','C'],'A'],['3. Find small a - छोटा a ढूंढो',['A','a','B'],'a'],['4. Ant starts with A? - Ant A से?',['Yes ✅','No ❌'],'Yes ✅'],['5. How many A in "Angry ants ate apples" ?',['3','4','5'],'4']],ans=0,sc=0;
 function buildQ(){ans=0;sc=0;$('res').hidden=true;$('quiz').innerHTML='';
- QS.forEach(function(q,qi){var d=document.createElement('div');d.className='q';d.innerHTML='<b>'+q[0]+'</b><div></div><em></em>';var row=d.children[1],fb=d.children[2],locked=false;
+ QS.forEach(function(q,qi){var d=document.createElement('div');d.className='q';d.innerHTML='<b>'+q[0]+'</b><div></div><em aria-live="polite"></em>';var row=d.children[1],fb=d.children[2],locked=false;
   q[1].forEach(function(o){var b=document.createElement('button');b.textContent=o;b.onclick=function(){if(locked)return;locked=true;ans++;
    if(o===q[2]){sc++;star('q'+qi,1);b.className='right';fb.textContent='✅ Sahi!';fb.style.color='var(--ok)';say('Correct')}else{b.className='wrong';fb.textContent='❌ Sahi jawab: '+q[2];fb.style.color='#dc2626';say('Try again')}
-   if(ans===QS.length){$('score').textContent='🏆 Score: '+sc+' / '+QS.length;$('nm').textContent=$('name').value.trim()||'Student';$('res').hidden=false;$('res').scrollIntoView({behavior:'smooth',block:'nearest'})}};row.appendChild(b)});
+   if(ans===QS.length){$('score').textContent='🏆 Score: '+sc+' / '+QS.length;sync();$('res').hidden=false;$('res').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'nearest'})}};row.appendChild(b)});
   $('quiz').appendChild(d)})}
 buildQ();
-$('print').onclick=function(){$('nm').textContent=$('name').value.trim()||'Student';window.print()};
+function sync(){$('nm').textContent=$('name').value.trim()||'Student';$('cls').textContent='Class: '+$('lvl').value;try{localStorage.setItem('vesA',JSON.stringify([$('name').value,$('lvl').value]))}catch(e){}}$('name').oninput=sync;$('lvl').onchange=sync;try{var sv=JSON.parse(localStorage.getItem('vesA')||'null');if(sv){$('name').value=sv[0]||'';$('lvl').value=sv[1]||'Nursery'}}catch(e){}sync();$('print').onclick=function(){sync();window.print()};$('retry').onclick=function(){buildQ();$('quiz').scrollIntoView()};
 $('wa').onclick=function(){window.open('https://wa.me/?text='+encodeURIComponent('🏅 '+($('name').value.trim()||'Student')+' ne VIKRAM ENGLISH SCHOOL, HATTA me Letter A seekha! '+$('score').textContent),'_blank')};
 $('again').onclick=function(){stars=0;star(0,0);done={};hit=0;$('fnd').textContent='';$('wrote').textContent='✅ I Wrote A - मैंने लिखा';[].forEach.call($('grid').children,function(b){b.className='cell';delete b.dataset.d});guide();buildQ();go(0)};
 go(0);
